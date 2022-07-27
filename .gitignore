@@ -54,3 +54,6 @@ venv.bak/
 
 # csv files
 *.csv
+
+#Desafios
+notebooks/Desafios/
