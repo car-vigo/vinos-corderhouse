@@ -64,5 +64,19 @@ def univariate_analysis(dataframe, column_name, table_dist= False):
         display(Markdown('### Distribucion de frequencias '))
         freq_dist(dataframe,column_name)
     
-    
+def count_plot_percentage(df, col_name, title):
+    """Grafico de barras con porcentaje de frecuencias"""
+    plt.figure(figsize=(15, 8))
+    ax = sns.countplot(data = df, x=col_name, order = df[col_name].value_counts().index, color="#7C3030")
+    plt.xticks(size=12)
+    plt.title(title)
+    plt.xlabel(col_name, size=14)
+    plt.ylabel('Count', size=14)
+
+    total = len(df[col_name])
+    for p in ax.patches:
+        percentage = '{:.2f}%'.format(100 * p.get_height()/total)
+        x = p.get_x() + p.get_width() / 2 - 0.16
+        y = p.get_y() + p.get_height()
+        ax.annotate(percentage, (x, y), size = 14)
     

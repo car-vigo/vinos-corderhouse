@@ -8,7 +8,7 @@ def get_upper_limit_whisker(column_df):
     # Rango interquartil de los superior
     iqr = column_df.quantile(0.75) - column_df.quantile(0.25)
     # Obtenemos el valor limite del boxplot 
-    return column_df.quantile(0.75) + 1.5 * (iqr)
+    return round(column_df.quantile(0.75) + 1.5 * (iqr),3)
 
 
 def get_lower_limit_whisker(column_df):
@@ -18,7 +18,7 @@ def get_lower_limit_whisker(column_df):
     # Rango interquartil de los inferior
     iqr = column_df.quantile(0.75) - column_df.quantile(0.25)
     # Obtenemos el valor limite del boxplot 
-    return column_df.quantile(0.25) - 1.5 * (iqr)
+    return round(column_df.quantile(0.25) - 1.5 * (iqr),3)
 
 def calculate_frequency_values(df, column):
     """
