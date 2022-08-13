@@ -1,3 +1,4 @@
+from dis import dis
 from matplotlib import pyplot as plt
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -11,7 +12,9 @@ import pandas as pd
 
 COLOR_VINO_TINTO = "#7C3030"
 
-def calculate_metrics(algorithm,x_test, y_test, y_test_pred):
+BASIC_METRICS = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
+
+def calculate_metrics(algorithm_name,algorithm,x_test, y_test, y_test_pred):
     """Calcula las metricas de precision, recall, f1, accuracy, y roc"""
     accuracy = accuracy_score(y_test, y_test_pred)
     precision = precision_score(y_test, y_test_pred)
@@ -19,7 +22,10 @@ def calculate_metrics(algorithm,x_test, y_test, y_test_pred):
     f1 = f1_score(y_test, y_test_pred)
     roc_auc = calculate_roc_auc(algorithm, x_test, y_test)
     metrics = {'accuracy': accuracy, 'precision': precision, 'recall': recall, 'f1': f1,'roc_auc': roc_auc["roc_auc"]}
-    return pd.DataFrame(pd.Series(metrics),columns=["value"]).round(2).sort_values(by=['value'], ascending=False)
+    roc_auc_plot = {'fpr': roc_auc['fpr'], 'tpr': roc_auc['tpr'], 'thresholds': roc_auc['thresholds']}
+    df_metrics = pd.DataFrame.from_dict(metrics, orient='index',columns=[algorithm_name]).round(2)
+    df_roc_auc_plot = pd.DataFrame(pd.Series(roc_auc_plot),columns=[algorithm_name])
+    return pd.concat([df_metrics, df_roc_auc_plot], axis=0)
 
 def calculate_roc_auc(algorithm, x_test, y_test):
     """Calcula el area bajo la curva roc"""
@@ -30,11 +36,11 @@ def calculate_roc_auc(algorithm, x_test, y_test):
     return {'fpr': fpr, 'tpr': tpr, 'thresholds': thresholds, 'roc_auc': roc_auc}
 
 
-def display_calculated_metrics(algorithm, x_test, y_test, y_test_pred):
+def display_calculated_metrics(algorithm_name,algorithm, x_test, y_test, y_test_pred):
     display(Markdown('### Metricas calculadas'))
-    metrics = calculate_metrics(algorithm, x_test, y_test, y_test_pred)
-    display(metrics.T)
-    metrics.plot(kind='bar', color=COLOR_VINO_TINTO)
+    metrics = calculate_metrics(algorithm_name,algorithm, x_test, y_test, y_test_pred).T[BASIC_METRICS].T.sort_values(by=algorithm_name, ascending=False).T
+    display(metrics)
+    metrics.T.plot(kind='bar', color=COLOR_VINO_TINTO)
 
 def display_confusion_matrix(algorithm, y_test, y_test_pred):
     """Muestra la confusion matrix"""
@@ -62,8 +68,8 @@ def plot_roc_curve(algorithm, x_test, y_test):
     plt.close()
 
 
-def display_and_plot_all_metrics(algorithm, x_test, y_test, y_test_pred):
+def display_and_plot_all_metrics(algorithm_name,algorithm, x_test, y_test, y_test_pred):
     display(Markdown('# Metricas: '))
-    display_calculated_metrics(algorithm, x_test, y_test, y_test_pred)
+    display_calculated_metrics(algorithm_name,algorithm, x_test, y_test, y_test_pred)
     display_confusion_matrix(algorithm, y_test, y_test_pred)
     plot_roc_curve(algorithm, x_test, y_test)
